@@ -1,0 +1,5 @@
+bertviz
+matplotlib
+numpy
+torch
+transformers

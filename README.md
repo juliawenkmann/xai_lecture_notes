@@ -1,34 +1,51 @@
-# Clean XAI Codebase (LIME & SHAP)
+# XAI Lecture Notes
 
-This is a minimal, clean structure with short notebooks that *only* call functions.
-Plots are written to `figures/<chapter>/` and notebooks live in `notebooks/<chapter>/`.
+The repo uses one shared Python package, `xai_book`. The cleaned notebooks under `notebooks/` stay as thin runners that import shared helpers instead of duplicating library code.
 
 ## Layout
 ```text
-figures/
-  02_perturbation_based/            # saved images from notebooks
+xai_book/
+  attention_based.py               # BERT attention / BertViz helpers
+  chapters/                         # chapter-level figure runners
+  concept_based.py                  # Broden + sensitivity-score helpers
+  concept_bottleneck.py             # compact CUB concept-bottleneck helpers
+  datasets.py                       # small reusable dataset loaders
+  gradient_based.py                 # CAM / Grad-CAM helpers
+  interpretable_models.py           # MDI / MDA helpers
+  models.py                         # tiny model helpers
+  perturbation.py                   # LIME/SHAP plotting functions
+  plotting.py                       # style + save helpers
+  paths.py                          # project and output paths
 notebooks/
-  02_perturbation_based/
-    02a_lime.ipynb
-    02b_shap.ipynb
-code/
-  data/                             # datasets
-  explainers/                       # LIME & SHAP wrappers
-  models/                           # tiny model zoo
-  plots/                            # orchestration to generate figures
-  utils/                            # io, paths, seeding
+  01_introduction/                 # standalone intro notebooks plus local data/
+  02_interpretable_models/          # chapter notebooks plus local data/ and out/
+  03_perturbation_based/            # topic folders with local notebooks, data/, and out/
+  04_gradient_based/                # thin notebooks that call xai_book
+  05_concept_based/                 # thin notebooks that call xai_book
+  06_attention_based/               # thin notebooks that call xai_book
+out/
+  ...                               # package-default fallback output location
 ```
 
 ## Quickstart
-1. Create an environment and install deps:
+1. Install the dependencies:
    ```bash
    pip install -r requirements.txt
    ```
-2. Open the notebooks in `notebooks/02_perturbation_based/` and run all cells.
-   - `02a_lime.ipynb` -> saves a LIME feature-importance plot.
-   - `02b_shap.ipynb` -> saves a KernelSHAP summary plot.
+2. Optional but recommended:
+   ```bash
+   pip install -e .
+   ```
+3. Open a notebook in `notebooks/02_interpretable_models/` through `notebooks/06_attention_based/` and run it top to bottom.
 
 ## Notes
-- Dataset: `sklearn.datasets.load_breast_cancer` (binary classification).
-- The SHAP notebook uses **KernelSHAP** (perturbation-based) for broad model support.
-- Folders are created on demand; outputs go to `figures/02_perturbation_based/`.
+- `xai_book` is the source of truth for shared plotting, dataset, model, perturbation, interpretable-model, gradient-based, concept-based, and attention-based logic.
+- The cleaned notebooks from `02_interpretable_models` through `06_attention_based` use a shared bootstrap pattern, import from `xai_book`, and save into local `out/` folders.
+- Notebook-local helper datasets, checkpoints, and other static assets live under each chapter's `data/` folder.
+- The interpretable-models chapter now includes a compact CUB concept-bottleneck notebook; place the raw `CUB_200_2011` release under `notebooks/02_interpretable_models/data/cub/raw/`.
+- The perturbation chapter now uses topic folders only, so LIME and SHAP runners live next to their related supplementary notebooks instead of being duplicated at chapter root.
+- Supplementary notebooks and bonus material remain under `notebooks/` as standalone examples where appropriate.
+
+## Remaining Work
+- Continue the same extraction pattern for the introduction, evaluation, deep-dream, and bonus material if you want the whole repo normalized.
+- Keep notebooks limited to parameter setup and function calls.

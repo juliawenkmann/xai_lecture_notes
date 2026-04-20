@@ -5,6 +5,3 @@ matplotlib
 requests
 Pillow
 numpy
-ipywidgets
-torchviz
-opencv-python

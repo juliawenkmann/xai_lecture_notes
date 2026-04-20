@@ -1,0 +1,17 @@
+numpy
+matplotlib
+networkx
+tensorflow
+scikit-image
+ipywidgets
+pandas
+scikit-learn
+plotly
+shap
+torch
+torchvision
+ruptures
+datasets
+dtaidistance
+lime
+seaborn

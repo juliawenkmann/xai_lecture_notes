@@ -3,5 +3,9 @@ pandas
 scikit-learn
 matplotlib
 seaborn
+statsmodels
 plotly
 ipywidgets
+Pillow
+torch
+torchvision
