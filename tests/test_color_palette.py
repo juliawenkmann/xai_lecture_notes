@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import re
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -52,10 +54,72 @@ class ColorPaletteTests(unittest.TestCase):
                 plotting.BOOK_ORANGE,
                 plotting.CHAPTER_GRAY,
                 plotting.SOFT_BLUE,
-                plotting.SOFT_SAGE,
-                plotting.SOFT_TAUPE,
+                plotting.SOFT_ORANGE,
+                plotting.SOFT_GRAY,
             ],
         )
+
+    def test_saved_matplotlib_figures_use_standard_book_canvas(self):
+        from PIL import Image
+
+        from xai_book import plotting
+        import matplotlib.pyplot as plt
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+
+            pdf_fig, pdf_axis = plt.subplots()
+            pdf_axis.plot([0, 1], [0, 1])
+            pdf_path = plotting.save_figure(pdf_fig, tmp_path / "figure.pdf")
+            pdf_bytes = pdf_path.read_bytes()
+            match = re.search(rb"/MediaBox\s*\[\s*0\s+0\s+([0-9.]+)\s+([0-9.]+)\s*\]", pdf_bytes)
+            self.assertIsNotNone(match)
+            width_points, height_points = (float(match.group(1)), float(match.group(2)))
+            self.assertAlmostEqual(width_points / 72, plotting.BOOK_CANVAS_SIZE[0], places=2)
+            self.assertAlmostEqual(height_points / 72, plotting.BOOK_CANVAS_SIZE[1], places=2)
+
+            png_fig, png_axis = plt.subplots()
+            png_axis.plot([0, 1], [1, 0])
+            png_path = plotting.save_figure(png_fig, tmp_path / "figure.png")
+            with Image.open(png_path) as image:
+                self.assertEqual(
+                    image.size,
+                    tuple(round(length * 300) for length in plotting.BOOK_CANVAS_SIZE),
+                )
+
+    def test_shared_figure_size_tokens_resolve_to_book_canvas(self):
+        from xai_book import plotting
+        import matplotlib as mpl
+
+        for token in plotting.FIGURE_SIZE_TOKENS:
+            self.assertEqual(plotting.figure_size(token), plotting.BOOK_CANVAS_SIZE)
+        self.assertEqual(
+            plotting.figure_size("grid", n_rows=3, n_cols=2, extra_height=1.0),
+            plotting.BOOK_CANVAS_SIZE,
+        )
+        plotting.apply_plot_style(figsize=(12.0, 8.0), use_seaborn=False)
+        self.assertEqual(tuple(mpl.rcParams["figure.figsize"]), plotting.BOOK_CANVAS_SIZE)
+
+        fig, _ = plotting.book_subplots(figsize=(12.0, 8.0))
+        self.assertEqual(tuple(fig.get_size_inches()), plotting.BOOK_CANVAS_SIZE)
+        plotting.plt.close(fig)
+
+    def test_plotly_style_uses_shared_book_palette_and_canvas(self):
+        from xai_book import plotting
+
+        class DummyFigure:
+            def __init__(self):
+                self.layout = {}
+
+            def update_layout(self, **kwargs):
+                self.layout.update(kwargs)
+
+        fig = DummyFigure()
+        plotting.apply_plotly_style(fig)
+
+        self.assertEqual(fig.layout["colorway"], plotting.extended_book_palette())
+        self.assertEqual(fig.layout["width"], round(plotting.BOOK_CANVAS_SIZE[0] * 100))
+        self.assertEqual(fig.layout["height"], round(plotting.BOOK_CANVAS_SIZE[1] * 100))
 
     def test_notebook_source_does_not_use_legacy_palette_tokens(self):
         offenders: list[str] = []

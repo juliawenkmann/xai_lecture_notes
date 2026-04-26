@@ -119,7 +119,7 @@ def plot_broden_mosaic(
 
     for separator_index in range(1, n_rows):
         y = 1 - separator_index / n_rows
-        fig.add_artist(Line2D([0, 1], [y, y], transform=fig.transFigure, color="black", linewidth=1))
+        fig.add_artist(Line2D([0, 1], [y, y], transform=fig.transFigure, color=CHAPTER_GRAY, linewidth=1))
     return fig
 
 

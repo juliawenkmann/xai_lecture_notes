@@ -9,7 +9,7 @@ import numpy as np
 from PIL import Image
 
 from .paths import ROOT_DIR
-from .plotting import book_subplots
+from .plotting import ORANGE, book_subplots, white_to_color_cmap
 
 
 def default_gradcam_image_path() -> Path:
@@ -140,18 +140,19 @@ def plot_cam_gradcam_comparison(
     fig, axes = book_subplots(1, 3, size="three_panel")
     resized_cam = resize_heatmap(cam_heatmap, image.size)
     resized_gradcam = resize_heatmap(gradcam_heatmap, image.size)
+    heatmap_cmap = white_to_color_cmap(ORANGE, "book_orange_heat")
 
     axes[0].imshow(image)
     axes[0].set_title("Input image")
     axes[0].axis("off")
 
     axes[1].imshow(image)
-    axes[1].imshow(resized_cam, cmap="jet", alpha=0.75)
+    axes[1].imshow(resized_cam, cmap=heatmap_cmap, alpha=0.75)
     axes[1].set_title("CAM")
     axes[1].axis("off")
 
     axes[2].imshow(image)
-    axes[2].imshow(resized_gradcam, cmap="jet", alpha=0.75)
+    axes[2].imshow(resized_gradcam, cmap=heatmap_cmap, alpha=0.75)
     axes[2].set_title("Grad-CAM")
     axes[2].axis("off")
     return fig
@@ -167,6 +168,7 @@ def plot_top_channel_overlays(
 ):
     channel_weights = np.maximum(gradients.mean(axis=(1, 2)), 0.0)
     top_indices = np.argsort(channel_weights)[-top_k:][::-1]
+    heatmap_cmap = white_to_color_cmap(ORANGE, "book_orange_channel_heat")
 
     fig, axes = book_subplots(1, top_k, size="grid", extra_height=-0.5)
     if top_k == 1:
@@ -176,7 +178,7 @@ def plot_top_channel_overlays(
         channel_map = np.maximum(activations[channel_index], 0.0)
         overlay = resize_heatmap(channel_map, image.size)
         axis.imshow(image)
-        axis.imshow(overlay, cmap="jet", alpha=0.7)
+        axis.imshow(overlay, cmap=heatmap_cmap, alpha=0.7)
         axis.set_title(f"Ch {channel_index}\n{channel_weights[channel_index]:.3f}")
         axis.axis("off")
 

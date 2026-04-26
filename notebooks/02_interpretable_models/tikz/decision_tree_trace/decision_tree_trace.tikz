@@ -1,0 +1,135 @@
+\definecolor{xaiOrange}{HTML}{F28E2B}
+\definecolor{xaiBlue}{HTML}{1F77B4}
+\definecolor{xaiGray}{HTML}{666666}
+\definecolor{xaiLightGray}{HTML}{D9DDE3}
+\definecolor{xaiText}{HTML}{222222}
+
+\tikzset{
+  axis/.style={xaiGray, line width=0.8pt, -{Latex[length=2mm]}},
+  split/.style={xaiText, line width=0.9pt},
+  guide/.style={xaiLightGray, line width=0.45pt},
+  tree edge/.style={xaiText, line width=1.0pt},
+  trace edge/.style={xaiOrange, line width=2.0pt, -{Latex[length=2.4mm]}},
+  tree node/.style={
+    circle,
+    draw=xaiText,
+    line width=0.9pt,
+    fill=white,
+    minimum size=8.5mm,
+    inner sep=1pt,
+    font=\sffamily\scriptsize,
+    text=xaiText,
+    align=center
+  },
+  trace node/.style={
+    tree node,
+    draw=xaiOrange,
+    line width=1.8pt
+  },
+  leaf/.style={
+    circle,
+    draw=xaiText,
+    line width=0.9pt,
+    fill=white,
+    minimum size=7.5mm,
+    inner sep=1pt,
+    font=\sffamily\scriptsize,
+    text=xaiText,
+    align=center
+  },
+  traced leaf/.style={
+    leaf,
+    draw=xaiOrange,
+    line width=1.8pt,
+    fill=xaiOrange!8
+  },
+  label/.style={font=\sffamily\scriptsize, text=xaiText},
+  callout/.style={
+    font=\sffamily\scriptsize,
+    text=xaiText,
+    align=left,
+    fill=white,
+    fill opacity=0.86,
+    text opacity=1,
+    inner sep=1.5pt
+  },
+}
+
+\begin{tikzpicture}[x=1cm,y=1cm,font=\sffamily]
+
+  % ---------------------------------------------------------------------------
+  % Partition view
+  % ---------------------------------------------------------------------------
+  \begin{scope}[shift={(0,0)}]
+    \path[fill=xaiGray!34] (0.3,0.3) rectangle (3.0,1.35);
+    \path[fill=xaiGray!20] (0.3,1.35) rectangle (3.0,2.15);
+    \path[fill=xaiOrange!13] (0.3,2.15) rectangle (3.0,3.35);
+    \path[fill=xaiGray!8] (3.0,0.3) rectangle (5.5,1.15);
+    \path[fill=xaiGray!15] (3.0,1.15) rectangle (5.5,2.35);
+    \path[fill=xaiGray!28] (3.0,2.35) rectangle (5.5,3.35);
+
+    \foreach \x in {1,2,3,4,5} {
+      \draw[guide] (\x,0.3) -- (\x,3.35);
+    }
+    \foreach \y in {1,2,3} {
+      \draw[guide] (0.3,\y) -- (5.5,\y);
+    }
+
+    \draw[split] (3.0,0.3) -- (3.0,3.35);
+    \draw[split] (0.3,2.15) -- (3.0,2.15);
+    \draw[split] (0.3,1.35) -- (3.0,1.35);
+    \draw[split] (3.0,2.35) -- (5.5,2.35);
+    \draw[split] (3.0,1.15) -- (5.5,1.15);
+
+    \draw[xaiText, line width=0.8pt] (0.3,0.3) rectangle (5.5,3.35);
+    \draw[axis] (0.3,0.3) -- (5.8,0.3);
+    \draw[axis] (0.3,0.3) -- (0.3,3.65);
+    \node[label, anchor=north] at (3.0,0.02) {$x_1$};
+    \node[label, anchor=east, rotate=90] at (-0.02,1.9) {$x_2$};
+
+    \node[label, anchor=east] at (0.25,2.15) {$x_2 \le c_2$};
+    \node[label, anchor=east] at (0.25,1.35) {$x_2 \le c_3$};
+
+    \fill[xaiOrange] (2.35,2.60) circle (2.5pt);
+    \draw[xaiOrange, line width=1.2pt] (2.35,2.60) circle (5pt);
+    \node[label, text=xaiOrange, anchor=west] at (2.52,2.76) {$\xi$};
+
+    \draw[xaiBlue, line width=1.5pt] (2.35,0.28) -- (2.35,3.47);
+    \draw[xaiBlue, line width=1.5pt] (0.28,2.60) -- (5.62,2.60);
+    \node[label, align=center, fill=white, fill opacity=0.75, text opacity=1, inner sep=1pt]
+      at (1.25,2.88) {$R_3$\\$\hat y=1.2$};
+  \end{scope}
+
+  % ---------------------------------------------------------------------------
+  % Tree view
+  % ---------------------------------------------------------------------------
+  \begin{scope}[shift={(7.1,0)}]
+    \node[trace node] (root) at (1.8,3.15) {$x_1$\\$\le c_1$};
+    \node[trace node] (left) at (0.65,2.05) {$x_2$\\$\le c_2$};
+    \node[tree node] (right) at (2.95,2.05) {$x_2$\\$\le c_4$};
+
+    \node[traced leaf] (leafA) at (-0.25,0.85) {$R_3$\\$1.2$};
+    \node[leaf] (leafB) at (1.30,0.85) {$R_2$\\$0.4$};
+    \node[leaf] (leafC) at (2.35,0.85) {$R_5$\\$-0.5$};
+    \node[leaf] (leafD) at (3.70,0.85) {$R_6$\\$-1.3$};
+
+    \draw[tree edge] (root) -- (right);
+    \draw[tree edge] (left) -- (leafB);
+    \draw[tree edge] (right) -- (leafC);
+    \draw[tree edge] (right) -- (leafD);
+
+    \draw[trace edge] (root) -- (left);
+    \draw[trace edge] (left) -- (leafA);
+
+    \node[label, anchor=south east] at ($(root)!0.52!(left)+(0,0.08)$) {left};
+    \node[label, anchor=south west] at ($(root)!0.52!(right)+(0,0.08)$) {right};
+    \node[label, text=xaiOrange, anchor=east] at ($(left)!0.50!(leafA)+(-0.05,0)$) {yes};
+    \node[label, anchor=west] at ($(left)!0.50!(leafB)+(0.05,0)$) {no};
+
+    \draw[xaiOrange, line width=1.0pt, -{Latex[length=2mm]}]
+      (2.42,3.50) -- (root.north east);
+    \node[callout, text=xaiOrange, anchor=west] at (2.48,3.50) {$\xi$};
+
+  \end{scope}
+
+\end{tikzpicture}

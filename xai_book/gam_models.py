@@ -323,12 +323,10 @@ def plot_gam_data_overview(*, data: pd.DataFrame):
             marker="o",
             markersize=4,
         )
-        axis.set_title(FEATURE_DISPLAY_NAMES[feature])
         axis.set_xlabel(FEATURE_DISPLAY_NAMES[feature])
         axis.grid(True, alpha=0.22)
 
     axes[0].set_ylabel("Observed demand index")
-    fig.suptitle("Synthetic demand data used in the GAM notebook")
     return fig
 
 
@@ -368,7 +366,6 @@ def plot_gam_model_comparison(
             bbox={"boxstyle": "round,pad=0.28", "facecolor": "white", "edgecolor": ANNOTATION_EDGE, "alpha": 0.95},
         )
 
-    fig.suptitle("Linear baseline versus additive spline model")
     return fig
 
 

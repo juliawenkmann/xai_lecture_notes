@@ -1,0 +1,63 @@
+\definecolor{xaiOrange}{HTML}{F28E2B}
+\definecolor{xaiBlue}{HTML}{1F77B4}
+\definecolor{xaiGray}{HTML}{666666}
+\definecolor{xaiLightGray}{HTML}{D9DDE3}
+\definecolor{xaiText}{HTML}{222222}
+
+\tikzset{
+  axis/.style={xaiGray, line width=0.8pt, -{Latex[length=2mm]}},
+  guide/.style={xaiLightGray, line width=0.6pt},
+  callout/.style={font=\sffamily\scriptsize, inner sep=2pt, text=xaiText, align=left},
+  label/.style={font=\sffamily\scriptsize, text=xaiText},
+  arrow/.style={xaiGray, line width=0.7pt, -{Latex[length=1.8mm]}},
+  segment/.style={draw=white, line width=1.0pt},
+}
+
+\begin{tikzpicture}[x=1cm,y=4.8cm,font=\sffamily]
+
+  \node[align=left, text=xaiText, font=\sffamily\footnotesize] (formula) at (0,0.92)
+    {$\displaystyle
+      \hat r_t^{\mathrm{stock}}
+      = \textcolor{xaiGray}{0.10}
+      + \textcolor{xaiOrange}{0.60 \cdot 1.0}
+      + \textcolor{xaiBlue}{0.20 \cdot 0.5}
+      = 0.80\%
+    $};
+
+  \node[callout, anchor=east] (intercept) at (1.90,0.12)
+    {\color{xaiGray}$0.10$\\intercept};
+  \node[callout, anchor=east] (stocklag) at (1.95,0.40)
+    {\color{xaiOrange}$0.60 \cdot 1.0 = 0.60$\\stock lag};
+  \node[callout, anchor=east] (marketlag) at (1.95,0.755)
+    {\color{xaiBlue}$0.20 \cdot 0.5 = 0.10$\\market lag};
+
+  \begin{scope}[shift={(2.65,0)}]
+    \draw[guide] (-0.12,0.10) -- (1.65,0.10);
+    \draw[guide] (-0.12,0.70) -- (1.65,0.70);
+    \draw[guide] (-0.12,0.80) -- (1.65,0.80);
+
+    \draw[axis] (-0.40,0) -- (-0.40,0.90);
+    \draw[axis] (-0.62,0) -- (1.85,0);
+
+    \draw[xaiGray, line width=0.6pt] (-0.46,0.80) -- (-0.34,0.80);
+    \node[label, anchor=east] at (-0.50,0.80) {$0.80$};
+    \node[label, anchor=north] at (-0.40,-0.02) {$0$};
+
+    \path[fill=xaiGray, segment] (0,0) rectangle (0.86,0.10);
+    \path[fill=xaiOrange, segment] (0,0.10) rectangle (0.86,0.70);
+    \path[fill=xaiBlue, segment] (0,0.70) rectangle (0.86,0.80);
+    \draw[xaiText, line width=0.8pt] (0,0) rectangle (0.86,0.80);
+
+    \draw[guide] (0.86,0.80) -- (1.38,0.80);
+    \node[label, anchor=west, font=\sffamily\scriptsize\bfseries, text=xaiText]
+      at (1.43,0.80) {forecast};
+
+    \node[label, anchor=north, align=center] at (0.43,-0.055)
+      {$\hat r_t^{\mathrm{stock}}$};
+  \end{scope}
+
+  \draw[arrow] (intercept.east) -- ($(2.65,0.08)$);
+  \draw[arrow] (stocklag.east) -- ($(2.65,0.40)$);
+  \draw[arrow] (marketlag.east) -- ($(2.65,0.75)$);
+
+\end{tikzpicture}

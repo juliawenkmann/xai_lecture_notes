@@ -1,0 +1,1033 @@
+4. Interpretable-by-design models
+
+37
+
+Introduction
+I for some models, interpretability not an issue
+I Examples:
+I linear models (with few coefficients)
+I decision trees (with small depth and width)
+
+Loan Application
+
+y = 0.5 · x1 ≠ 0.2 · x2
+
+Credit Risk
+
+y
+
+x1
+
+≠x2
+
+High
+
+Medium
+
+Low
+
+Reject
+
+Income
+
+Accept
+
+High
+
+Medium
+
+Low
+
+Accept
+
+Review
+
+Reject
+38
+
+4.1. Linear models
+
+39
+
+匕
+
+outputslp
+
+Ordinary least squares (OLS)
+
+respons
+
+ー
+?
+
+I Figure: ordinary linear regression (in 1D)
+
+puts
+
+40
+
+OLS: quick recap
+
+features
+
+벼
+
+I Linear models: output depends linearly on each feature
+I mathematically, in the regression setting, our model is:
+’x œ R ,
+inputO
+d
+
+f (x ) = —1 x1 + —2 x2 + · · · + —d xd ,
+
+and we think of the data as f (x ) + Á
+I given training data (x (1) , y (1) ), . . . , (x (n) , y (n) ), model is fitted by ordinary least squares
+Y
+A
+B2 Z
+n
+d
+]ÿ
+^
+ÿ
+(i)
+—ˆ œ arg min
+y (i) ≠
+—j xj
+[
+\
+—
+
+.
+mTjthfeature
+example
+of ith
+i=1
+
+j=1
+
+I Intuition: minimize the sum of squares of prediction errors
+
+41
+
+凸然
+
+OLS: quick recap
+I Question: how to do it, concretely?
+
+I collect all inputs in data matrix X œ Rn◊d
+I collect all responses in Y œ Rn
+d ad
+
+에
+
+I Claim: if X € X œ R is invertible, —ˆ is given by
+
+—ˆ = (X € X )≠1 X € Y .
+
+I Remark: if X € X is not invertible, take the Moore-Penrose pseudo-inverse
+I generally a good idea to use existing libraries:
+
++た
+
+(: ∴ )
+
+ERaXn
+
+、
+袋
+
+.
+
+42
+
+idmittar
+
+Controlling complexity
+
+I usual ways to control the size / number of non-zeros coefficients: ridge16 and LASSO17
+I Ridge regression: adding a L2 penalty in the optimization:
+Y
+Z
+A
+B2
+d
+d
+] n
+ÿ
+ÿ
+ÿ ^
+cef.
+finds
+(i)
+min
+y (i) ≠
+—j xj
++⁄
+—j2 ,
+\
+with small values
+.— [
+
+-
+
+↳
+
+C
+"
+
+good
+
+i=1
+
+j=1
+
+j=1
+
+where ⁄ > 0 is a hyperparameter
+I Least Absolute Shrinkage and Selection Operator (LASSO): adding a L1 penalty:
+Y
+Z
+coef. with
+A
+B2
+n
+d
+d
+]ÿ
+^
+ÿ
+ÿ
+(i)
+min
+y (i) ≠
+—j xj
++⁄
+|—j | ,
+x
+xe +
+lots of zeroes
+\
+— [
+, ,+
+
+finds
+
+.
+
+*
+i=1
+
+j=1
+
+j=1
+
+D
+
+* baxe
+
+where ⁄ > 0 is a hyperparameter
+
+16 Hoerl and Kennard, Ridge regression: Biased estimation for nonorthogonal problems, Technometrics, 1970
+
+17 Tibshirani, Regression shrinkage and selection via the lasso, Journal of the Royal Statistical Society Series
+B: Statistical Methodology, 1996
+
+43
+
+。
+f
+
+Linear models: interpretability
+
+f×に …+
+8
+
+Ajfgto
+
+* 그)
+
+I Why are these models interpretable? increasing xj by one unit increases f (x ) *
+by —j
+I let us look at a concrete example: regression task on the California housing dataset18
+I we run LASSO on a train set (75% of the data)
+I RMSE on the test is 0.83 (not too bad!)
+
+법
+
+I we can read the coefficients:
+
+do
+
+0O0 00to Intercept
+interpretation
+
+=
+
+I Mathematically: our model is given by
+
+.
+
+.
+
+. .
+
+ㅂ
+
+depends
+
+f (x ) = 0.285 + 0.346 · xMedInc + 0.015 · xHouseAge ≠ 0.001 · xAveOccup .
+I we can directly read in these coefficients what our model is doing!
+
+on
+
+the normali
+
+-
+
+18 Pace and Barry, Sparse Spatial Autoregressions, Statistics & Probability Letters, 1997
+
+:
+
+Zation te
+ot
+
+a
+
+44
+
+4.2. Vector autoregression (VAR)
+
+45
+
+Autoregressive forecast
+I Variation on this theme: time series prediction
+I Example: stock prices
+
+I Figure: (normalized) stock prices for Amazon and the Nasdaq
+46
+
+Lags
+
+t
+
+time
+
+=
+
+.
+
+I Question: what are the features in that case?
+I simply take the past values (= lags)
+
+=
+
+xf
+
+-
+
+s
+
+I Formally: predict xt œ R using xt≠1 , . . . , xt≠d as
+xt =
+
+d
+ÿ
+j=1
+
+aj xt≠j , =
+
+aXt 1
+
++
+
+a2X7 27
+
+-
+
+.
+
+-
+
+-
+
+where a1 , . . . , ad are the parameters of our model
+q
+I we think of the data as yt = dj=1 aj yt≠j + Át , where Át is some noise
+I to find the aj s, two main options:
+*
+
+...
+
++
+
+.
+9dXt d
+-
+
+ㅣ
+
+*
+前
+袋
+s
+
+I least-squares; x i * … ,
+.…*
+I solving the Yule-Walker19,20 equations
+x
+
+*
+
+19 Yule, On a method of investigating periodicities disturbed series, with special reference to Wolfer’s sunspot
+
+numbers, Trans. Royal Soc., 1927
+20 Walker, On periodicity in series of related terms, Phil. Trans. Royal Soc., 1931
+
+:
+47
+
+Lags, illustrated
+
+I Figure: lagged inputs for financial time series
+
+48
+
+Vector autoregression
+I Natural extension: joint forecasting of time series
+I to put it simply: xt œ Rp
+
+=
+
+ptime series
+
+2x2
+
+I the aj s coefficients are replaced by a matrix
+
+I Example: d = 1, p = 2, stock return and market return:
+3 stock 4 3 4
+3 stock 4 3 4
+rt
+c1
+r
+u
+=
++ A t≠1
++ 1t .
+mkt
+c2
+u2t
+rtmkt
+rt≠1
+
+_
+
+AE R
+
+I finding good parameters is similar (multivariate regression)
+
+LAe argmin
+
+I we use the statsmodels package
+
+.....
+
+50
+
+Vector autoregression
+
+>
+
+litted model
+
+I the fitted coefficients are
+3 stock 4 3
+4 3
+4 3 stock 4 3 4
+rt
+0.10
+0.60 0.20
+rt≠1
+u
+*7
+=
++
++ 1t ,
+mkt
+0.05
+≠0.10 0.70
+u2t
+rtmkt
+rt≠1
+
+L」
+
+000 “
+
+I assume last week’s returns were
+
+stock
+rt≠1
+= 1.0%,
+
+mkt
+rt≠1
+= 0.5%.
+
+I then the one-step-ahead forecasts are
+
+ML 7
+
+s
+
+r̂tstock = 0.10 + 0.60(1.0) + 0.20(0.5) = 0.80%,
+r̂ mkt = 0.05 ≠ 0.10(1.0) + 0.70(0.5) = 0.30%.
+
+∞ t
+
+51
+
+Vector autoregression
+Observed history
+True next price
+AAPL
+Predicted next
+price + AMZN: rolling one-step forecast summary
+MAPE 8.0% vs 11.2%
+
+1.6
+
+AAPL
+
+1.4
+
+1.2
+
+1.0
+
+1.6
+
+MAPE 1.7% vs 2.8%
+
+AMZN
+
+1.5
+1.4
+1.3
+1.2
+1.1
+1.0
+2018 01
+
+2018 04
+
+2018 07
+
+2018 10
+
+2019 01
+
+2019 04
+
+2019 07
+
+2019 10
+
+2020 01
+
+Date
+
+I Figure: VAR in action: jointly predicting Amazon and Apple; MAPE = mean absolute
+percentage error
+52
+
+4.3. Generalized additive models
+(GAMs)
+
+54
+
+龜
+
+f (x 1
+
+Generalized additive models (GAMs)
+
+=
+
+xihz
+
+∞
+
+I Straightforward extension of linear models:21
+’x œ Rd ,
+
+where f1 , . . . , fd : R æ R
+
+f (x ) = f1 (x1 ) + f2 (x2 ) + · · · + fd (xd ) ,
+
+esrestrictin ) fj 7 =θ * 8
+
+I Remark: still no interactions [
+
+clinear case)
+
+I Question: what to choose for f1 , . . . , fd ?
+I Typical choices include:
+I polynomials
+I splines
+I neural nets22
+I ...
+
+,冠籤
+
+8
+
+→
+
+x7= NN , )+ NN, (x)+
+x
+
+>
+-
+
+NN , /)
+
+find the paper
+
+.
+
+21 Hastie and Tibshirani, Generalized Additive Models, Monographs on Statistics and Probability, 1990
+
+22 Agarwal et al., Neural Additive Models: Interpretable Machine Learning with Neural Nets, NeurIPS, 2021
+
+55
+
+teaci
+\
+
+三宮
+
+fla )
+
+:o
+×
+Nant
+fe
+ntaesting 0
+s
+
+d
+
+= .
+1
+
+s
+
+fHa = . a 7
+)
+
+{
+
+(
+
+-
+
++
+
+-
+
++
+
+falxd
+Splines
+
+I Definition: piecewise polynomial
+
+N
+
+) 3r
+
+uin
+
+I generally degree fixed by the user, complexity controlled by penalization
+I Typical objective:
+
+σ
+T
+ÿ
+t=1
+
+!
+
+yt ≠ ŷt
+
+"2
+
++
+
+d
+ÿ
+j=1
+
+⁄j
+
+⁄
+
+# ÕÕ $2
+fj (x ) dx .
+
+I ⁄1 , . . . , ⁄d control smoothness: large ⁄ pushes towards straight line
+I Example: continuing previous example:
+
+& can
+
+! stock "
+! mkt "
+rtstock = —0 + f1 rt≠1
++ f2 rt≠1
++ Át .
+
+we
+
+optimize the intervals ?
+
+wwen
+
+56
+
+Explaining GAMs
+
+I Two types of explanations:
+
+I decompose a given forecast (local explanation)
+I plot fj over data range (blue curve in previous slide)
+
+stock
+mkt
+I Back to the example: assume rt≠1
+= 1.0 and rt≠1
+= 0.5,
+
+rtstock = —ˆ0 + fˆ1 (1.0) + fˆ2 (0.5).
+=∆ 0.70 = 0.10 + 0.45 + 0.15.
+
+57
+
+GAMs in action
+$%
+
+(
+
+$
+
+% $
+
+앞째)
+
+メに
+
+$%
+
+(
+
+‰
+
+X=
+
+$
+
+I Figure: predicting consumer demand from three features
+←
+は
+
+2
+
+f
+
+% $
+
+)
+(*
+( x7 8 ( * 、 7+ fe )+
+=
+
+、
+
+58
+
+Comparison with linear model
+Temperature ( C)
+
+Marketing spend ($k)
+
+Predicted demand index
+
+Linear baseline
+
+Discount (%)
+
+Additive spline model
+
+90
+
+90
+
+90
+
+85
+
+85
+
+85
+
+80
+
+80
+
+75
+
+75
+
+75
+
+70
+
+70
+
+70
+
+65
+
+65
+
+65
+
+60
+
+60
+
+60
+
+80
+
+%
+
+10
+
+20
+
+30
+
+Temperature ( C)
+
+5
+
+10
+
+Marketing spend ($k)
+
+0
+
+10
+
+20
+
+30
+
+Discount (%)
+
+I Figure: comparing with a linear model
+59
+
+Overall comparison
+
+I Figure: comparing our favorite forecasters
+
+60
+
+Identifiability
+I GAMs are not identifiable23
+I Example: say y = f1 (x1 ) + f2 (x2 )
+I then
+
+=
+
+fCx )
+
+y = g1 (x1 ) + g2 (x2 ) = (f1 (x1 ) ≠
+
+) + (f2 (x2 ) +
+
+)
+
+n
+
+is an equally valid decomposition
+I in this lecture, we do not care, we want to explain the model!
+I but, if you want to explain the data, this is an issue
+I Partial solution: force
+
+’j œ [d],
+
+⁄
+
+fj (xj )dµ(xj ) = 0 .
+
+23 Zhang et al., Challenges in interpretability of additive models, preprint, 2025
+
+61
+
+4.5. Decision trees
+
+69
+
+Decision tree: quick recap
+
+I What is a decision tree?
+
+I tree with root = X and leaves = cells
+I iterative binary decisions based on feature values
+I node of the tree: “is feature j smaller than x ?”
+I if yes, go left, if not, go right
+I Can also be visualized as partition of the input space X
+I each query point falls into a cell, constant prediction on each cell
+
+I two different modes:
+
+I classification æ class label æ majority vote
+I regression æ real number æ empirical average
+
+70
+
+Decision tree: example
+
+「
+I Figure: example of a decision tree for regression in 2D
+71
+
+혭
+
+Decision tree: example
+
+:
+p
+R
+
+∠
+
+↳ modesupe
+that Iwant to
+
+explain
+
+.
+
+표
+
+-
+
+I Figure: associated partition of the space
+
+"I
+
+got this value because s and r2
+,
+
+and
+
+trace of 5
+
+ry" .
+
+.
+
+72
+
+ㆁ
+=
+
+'
+
+ㆁ
+
+_
+
+'ㆀ
+_
+
+ㆁ
+
+วม อ นอ
+ㆁ
+
+σ
+
+ㆁ
+
+ㆀ
+
+%
+
+/
+
+:
+
+:
+
+:
+
+f
+
+「
+
+「
+
+มื
+
+「
+
+ดิ
+
+วี
+
+ร่
+
+의_
+
+Decision trees: interpretability
+I Why is this model interpretable?
+
+I let us look at a concrete example: the Wine dataset24
+
+24 Cortez et al., Modeling wine preferences by data mining from physicochemical properties, Decision Support
+Systems, 1998
+
+78
+
+Decision trees: interpretability
+I for a specific example, we can run down the path to understand the decision
+I we can also infer global rules
+I for instance, we know that
+{proline Æ 755.0, per. dil Æ 2.115} æ class 2 .
+
+79
+
+Summary
+
+I decision trees are light-weight models
+I recursively splitting the input space according to a numerical criterion
+I Limitations:
+I accuracy far from state-of-the-art (model too simple)
+I interpretability decreases with number of leaves (see next section)
+
+I They are interpretable: either tracing down the decision or deducing global rules
+I possible to be more quantitative (mean decrease impurity / accuracy)25
+
+GI extension to random forests possible
+
+25 Breiman, Random Forests, Machine Learning, 2001
+
+80
+
+

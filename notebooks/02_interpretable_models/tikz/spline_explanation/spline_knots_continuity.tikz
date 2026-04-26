@@ -1,0 +1,73 @@
+\definecolor{xaiOrange}{HTML}{F28E2B}
+\definecolor{xaiBlue}{HTML}{1F77B4}
+\definecolor{xaiGray}{HTML}{666666}
+\definecolor{xaiLightGray}{HTML}{D9DDE3}
+\definecolor{xaiText}{HTML}{222222}
+
+\tikzset{
+  axis/.style={xaiGray, line width=0.8pt, -{Latex[length=2mm]}},
+  guide/.style={xaiLightGray, line width=0.65pt, dashed},
+  knot/.style={xaiGray, line width=0.7pt, dashed},
+  segmentA/.style={xaiOrange, line width=2.2pt},
+  segmentB/.style={xaiBlue, line width=2.2pt},
+  segmentC/.style={xaiGray, line width=2.2pt},
+  tangent/.style={xaiText, line width=0.8pt, -{Latex[length=1.6mm]}},
+  label/.style={font=\sffamily\scriptsize, text=xaiText},
+  mathlabel/.style={font=\sffamily\footnotesize, text=xaiText, align=left},
+  nodepoint/.style={circle, fill=white, draw=xaiText, line width=0.8pt, inner sep=1.6pt},
+}
+
+\begin{tikzpicture}[x=1cm,y=1cm,font=\sffamily]
+
+  % Axes and guide lines
+  \draw[axis] (0,0) -- (7.4,0) node[label, anchor=west] {$x$};
+  \draw[axis] (0,0) -- (0,3.4) node[label, anchor=south] {$f(x)$};
+  \foreach \y in {1,2,3} {
+    \draw[xaiLightGray, line width=0.45pt] (0,\y) -- (7.2,\y);
+  }
+
+  % Knots
+  \draw[knot] (1.55,0) -- (1.55,3.1);
+  \draw[knot] (3.35,0) -- (3.35,3.1);
+  \draw[knot] (5.15,0) -- (5.15,3.1);
+  \node[label, anchor=north] at (1.55,-0.08) {$\kappa_1$};
+  \node[label, anchor=north] at (3.35,-0.08) {$\kappa_2$};
+  \node[label, anchor=north] at (5.15,-0.08) {$\kappa_3$};
+
+  % Piecewise polynomial curve
+  \draw[segmentA]
+    (0.35,0.75) .. controls (0.70,1.35) and (1.10,2.15) .. (1.55,2.05);
+  \draw[segmentB]
+    (1.55,2.05) .. controls (2.05,1.95) and (2.75,1.05) .. (3.35,1.35);
+  \draw[segmentA]
+    (3.35,1.35) .. controls (3.95,1.65) and (4.45,2.55) .. (5.15,2.45);
+  \draw[segmentC]
+    (5.15,2.45) .. controls (5.85,2.35) and (6.25,1.35) .. (6.95,1.15);
+
+  % Joined values at knots
+  \node[nodepoint] at (1.55,2.05) {};
+  \node[nodepoint] at (3.35,1.35) {};
+  \node[nodepoint] at (5.15,2.45) {};
+
+  % Segment labels
+  \node[label, text=xaiOrange] at (0.90,2.35) {$p_1(x)$};
+  \node[label, text=xaiBlue] at (2.35,0.85) {$p_2(x)$};
+  \node[label, text=xaiOrange] at (4.25,2.75) {$p_3(x)$};
+  \node[label, text=xaiGray] at (6.20,1.65) {$p_4(x)$};
+
+  % Continuity cue at central knot
+  \draw[tangent] (2.90,1.10) -- (3.22,1.28);
+  \draw[tangent] (3.80,1.62) -- (3.48,1.42);
+  \draw[xaiBlue, line width=0.7pt] (3.08,1.62) .. controls (3.25,1.78) and (3.45,1.78) .. (3.62,1.62);
+  \node[label, anchor=south] at (3.35,1.83) {$f,\ f',\ f''$};
+
+  % Compact definition block
+  \node[mathlabel, anchor=west] at (7.85,2.75) {$f(x)=p_j(x)$ on interval $j$};
+  \node[mathlabel, anchor=west] at (7.85,2.25) {$p_j(x)=a_j+b_jx+c_jx^2+d_jx^3$};
+  \node[mathlabel, anchor=west] at (7.85,1.70) {$p_j(\kappa)=p_{j+1}(\kappa)$};
+  \node[mathlabel, anchor=west] at (7.85,1.25) {$p'_j(\kappa)=p'_{j+1}(\kappa)$};
+  \node[mathlabel, anchor=west] at (7.85,0.80) {$p''_j(\kappa)=p''_{j+1}(\kappa)$};
+
+  \draw[xaiLightGray, line width=0.7pt] (7.55,0.55) -- (7.55,3.05);
+
+\end{tikzpicture}

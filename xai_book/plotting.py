@@ -35,8 +35,7 @@ CHAPTER_GRAY = _blend_with_white(CHAPTER_GRAY_BASE, 0.20)
 
 SOFT_BLUE = _blend_with_white(BOOK_BLUE_BASE, 0.58)
 SOFT_ORANGE = _blend_with_white(BOOK_ORANGE_BASE, 0.58)
-SOFT_SAGE = "#B7D0BE"
-SOFT_TAUPE = "#C7B3A2"
+SOFT_GRAY = _blend_with_white(CHAPTER_GRAY_BASE, 0.58)
 
 BLUE = BOOK_BLUE
 ORANGE = BOOK_ORANGE
@@ -49,16 +48,16 @@ ANNOTATION_EDGE = "#D3DCE8"
 
 BOOK_EXPORT_WIDTH = 6.8
 BOOK_BASE_HEIGHT = 4.0
-BOOK_ADDITIONAL_ROW_HEIGHT = 2.1
+BOOK_CANVAS_SIZE = (BOOK_EXPORT_WIDTH, BOOK_BASE_HEIGHT)
 DEFAULT_DPI = 180
 DEFAULT_FONT_SIZE = 11
 DEFAULT_LINE_WIDTH = 2.0
-NOTEBOOK_FONT_SIZE = 12
-NOTEBOOK_TITLE_SIZE = 15
-NOTEBOOK_LABEL_SIZE = 12
-NOTEBOOK_TICK_SIZE = 11
-NOTEBOOK_LEGEND_SIZE = 11
-NOTEBOOK_ANNOTATION_SIZE = 11
+NOTEBOOK_FONT_SIZE = DEFAULT_FONT_SIZE
+NOTEBOOK_TITLE_SIZE = DEFAULT_FONT_SIZE + 1
+NOTEBOOK_LABEL_SIZE = DEFAULT_FONT_SIZE
+NOTEBOOK_TICK_SIZE = DEFAULT_FONT_SIZE - 1
+NOTEBOOK_LEGEND_SIZE = DEFAULT_FONT_SIZE - 1
+NOTEBOOK_ANNOTATION_SIZE = DEFAULT_FONT_SIZE - 1
 
 LATEX_TEXT_REPLACEMENTS = (
     ("\\", r"\textbackslash{}"),
@@ -85,55 +84,30 @@ def latex_escape(text: Any) -> str:
     return escaped
 
 
-def panel_figure_size(
-    n_rows: int = 1,
-    n_cols: int = 1,
-    *,
-    extra_width: float = 0.0,
-    extra_height: float = 0.0,
-) -> tuple[float, float]:
-    width = BOOK_EXPORT_WIDTH + extra_width
-    height = BOOK_BASE_HEIGHT + max(0, n_rows - 1) * BOOK_ADDITIONAL_ROW_HEIGHT + extra_height
-    if n_cols > 1:
-        height += 0.15 * (n_cols - 1)
-    return (width, height)
+FIGURE_SIZE_TOKENS = frozenset(
+    {
+        "single",
+        "wide",
+        "square",
+        "two_panel",
+        "three_panel",
+        "grid",
+        "grid_2x2",
+        "breakdown",
+        "heatmap",
+        "tree",
+    }
+)
+
+DEFAULT_FIGSIZE = BOOK_CANVAS_SIZE
+NOTEBOOK_WIDE_FIGSIZE = BOOK_CANVAS_SIZE
+NOTEBOOK_SQUARE_FIGSIZE = BOOK_CANVAS_SIZE
 
 
-FIGURE_SIZE_TOKENS = {
-    "single": panel_figure_size(),
-    "wide": panel_figure_size(extra_height=0.2),
-    "square": (BOOK_EXPORT_WIDTH * 0.84, BOOK_EXPORT_WIDTH * 0.84),
-    "two_panel": panel_figure_size(n_cols=2),
-    "three_panel": panel_figure_size(n_cols=3, extra_height=-0.1),
-    "grid_2x2": panel_figure_size(n_rows=2, n_cols=2, extra_height=0.55),
-    "breakdown": panel_figure_size(extra_height=0.35),
-    "heatmap": panel_figure_size(extra_height=0.8),
-    "tree": panel_figure_size(extra_height=1.8),
-}
-
-DEFAULT_FIGSIZE = FIGURE_SIZE_TOKENS["single"]
-NOTEBOOK_WIDE_FIGSIZE = FIGURE_SIZE_TOKENS["wide"]
-NOTEBOOK_SQUARE_FIGSIZE = FIGURE_SIZE_TOKENS["square"]
-
-
-def figure_size(
-    size: str = "single",
-    *,
-    n_rows: int | None = None,
-    n_cols: int | None = None,
-    extra_width: float = 0.0,
-    extra_height: float = 0.0,
-) -> tuple[float, float]:
-    if n_rows is not None or n_cols is not None or extra_width or extra_height:
-        return panel_figure_size(
-            n_rows=n_rows or 1,
-            n_cols=n_cols or 1,
-            extra_width=extra_width,
-            extra_height=extra_height,
-        )
+def figure_size(size: str = "single", **_: Any) -> tuple[float, float]:
     if size not in FIGURE_SIZE_TOKENS:
         raise KeyError(f"Unknown figure size token {size!r}")
-    return FIGURE_SIZE_TOKENS[size]
+    return BOOK_CANVAS_SIZE
 
 
 def book_palette(*, include_gray: bool = True) -> list[str]:
@@ -144,7 +118,7 @@ def book_palette(*, include_gray: bool = True) -> list[str]:
 
 
 def extended_book_palette() -> list[str]:
-    return [BLUE, ORANGE, CHAPTER_GRAY, SOFT_BLUE, SOFT_SAGE, SOFT_TAUPE]
+    return [BLUE, ORANGE, CHAPTER_GRAY, SOFT_BLUE, SOFT_ORANGE, SOFT_GRAY]
 
 
 def _build_rc_params(
@@ -201,7 +175,7 @@ def _build_rc_params(
         "legend.frameon": False,
         "legend.labelcolor": FOREGROUND,
         "legend.borderaxespad": 0.6,
-        "axes.prop_cycle": mpl.cycler(color=book_palette(include_gray=False)),
+        "axes.prop_cycle": mpl.cycler(color=book_palette(include_gray=True)),
         "mathtext.fontset": "cm",
         "text.usetex": use_latex,
         "text.latex.preamble": LATEX_PREAMBLE if use_latex else "",
@@ -224,7 +198,7 @@ def apply_plot_style(
     background: str | None = None,
     use_seaborn: bool = True,
 ) -> None:
-    figsize = figsize or figure_size(size or "single")
+    figsize = figure_size(size or "single")
     font_size = font_size or DEFAULT_FONT_SIZE
     title_size = title_size or (font_size + 1)
     label_size = label_size or font_size
@@ -252,7 +226,7 @@ def apply_plot_style(
             sns.set_theme(
                 style="whitegrid",
                 context="notebook",
-                palette=book_palette(include_gray=False),
+                palette=book_palette(include_gray=True),
                 rc=rc_params,
             )
             return
@@ -269,7 +243,7 @@ def apply_notebook_style(
     use_seaborn: bool = True,
 ) -> None:
     apply_plot_style(
-        figsize=figsize or figure_size(size or "wide"),
+        size=size or "wide",
         font_size=NOTEBOOK_FONT_SIZE,
         title_size=NOTEBOOK_TITLE_SIZE,
         label_size=NOTEBOOK_LABEL_SIZE,
@@ -295,13 +269,7 @@ def book_subplots(
     extra_height: float = 0.0,
     **kwargs,
 ):
-    resolved_figsize = figsize or figure_size(
-        size,
-        n_rows=nrows if size == "grid" else None,
-        n_cols=ncols if size == "grid" else None,
-        extra_width=extra_width,
-        extra_height=extra_height,
-    )
+    resolved_figsize = figure_size(size)
     if style == "notebook":
         apply_notebook_style(figsize=resolved_figsize, grid_axis=grid_axis, background=background)
     else:
@@ -354,8 +322,52 @@ def apply_plotly_style(
         font=dict(family=PLOTLY_FONT_FAMILY, size=NOTEBOOK_TICK_SIZE, color=FOREGROUND),
         title_font=dict(size=NOTEBOOK_TITLE_SIZE, color=FOREGROUND),
         legend=dict(font=dict(size=NOTEBOOK_LEGEND_SIZE, color=FOREGROUND)),
+        colorway=extended_book_palette(),
         margin=dict(l=56, r=28, t=76, b=56),
     )
+
+
+def standardize_figure_for_book(
+    fig,
+    *,
+    canvas_size: tuple[float, float] = BOOK_CANVAS_SIZE,
+    strip_titles: bool = False,
+) -> None:
+    fig.set_size_inches(*canvas_size, forward=True)
+    fig.set_facecolor(TRANSPARENT_BACKGROUND)
+    if strip_titles:
+        strip_figure_titles(fig)
+    for axis in fig.axes:
+        if hasattr(axis, "set_facecolor"):
+            axis.set_facecolor(TRANSPARENT_BACKGROUND)
+        if hasattr(axis, "tick_params"):
+            axis.tick_params(colors=FOREGROUND, labelsize=NOTEBOOK_TICK_SIZE)
+        if hasattr(axis, "xaxis"):
+            axis.xaxis.label.set_color(FOREGROUND)
+            axis.xaxis.label.set_fontsize(NOTEBOOK_LABEL_SIZE)
+        if hasattr(axis, "yaxis"):
+            axis.yaxis.label.set_color(FOREGROUND)
+            axis.yaxis.label.set_fontsize(NOTEBOOK_LABEL_SIZE)
+        if hasattr(axis, "title"):
+            axis.title.set_color(FOREGROUND)
+            axis.title.set_fontsize(NOTEBOOK_TITLE_SIZE)
+        legend = axis.get_legend() if hasattr(axis, "get_legend") else None
+        if legend is not None:
+            legend.set_frame_on(False)
+            for text in legend.get_texts():
+                text.set_color(FOREGROUND)
+                text.set_fontsize(NOTEBOOK_LEGEND_SIZE)
+
+
+def strip_figure_titles(fig) -> None:
+    suptitle = getattr(fig, "_suptitle", None)
+    if suptitle is not None:
+        suptitle.set_text("")
+    for axis in fig.axes:
+        if hasattr(axis, "set_title"):
+            axis.set_title("")
+            axis.set_title("", loc="left")
+            axis.set_title("", loc="right")
 
 
 def blue_orange_cmap(name: str = "blue_orange") -> LinearSegmentedColormap:
@@ -367,9 +379,22 @@ def white_to_color_cmap(color: str, name: str | None = None) -> LinearSegmentedC
     return LinearSegmentedColormap.from_list(cmap_name, [BACKGROUND, color], N=256)
 
 
-def save_figure(fig, path: Path | str, dpi: int = 300, tight_layout: bool = True) -> Path:
+def save_figure(
+    fig,
+    path: Path | str,
+    dpi: int = 300,
+    tight_layout: bool = True,
+    *,
+    strip_titles: bool = True,
+    standardize: bool = True,
+    canvas_size: tuple[float, float] = BOOK_CANVAS_SIZE,
+) -> Path:
     out_path = Path(path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
+    if standardize:
+        standardize_figure_for_book(fig, canvas_size=canvas_size, strip_titles=strip_titles)
+    elif strip_titles:
+        strip_figure_titles(fig)
     use_tight_layout = tight_layout and hasattr(fig, "tight_layout")
     if hasattr(fig, "get_constrained_layout") and fig.get_constrained_layout():
         use_tight_layout = False
@@ -380,16 +405,19 @@ def save_figure(fig, path: Path | str, dpi: int = 300, tight_layout: bool = True
             pass
     facecolor = fig.get_facecolor()
     transparent = isinstance(facecolor, tuple) and len(facecolor) == 4 and facecolor[-1] == 0.0
-    fig.savefig(out_path, dpi=dpi, bbox_inches="tight", transparent=transparent)
+    save_kwargs: dict[str, Any] = {"dpi": dpi, "transparent": transparent}
+    if not standardize:
+        save_kwargs["bbox_inches"] = "tight"
+    fig.savefig(out_path, **save_kwargs)
     plt.close(fig)
     return out_path
 
 
-def display_and_save_figure(fig, path: Path | str, dpi: int = 300, tight_layout: bool = True) -> Path:
+def display_and_save_figure(fig, path: Path | str, dpi: int = 300, tight_layout: bool = True, **save_kwargs) -> Path:
     from IPython.display import display
 
     display(fig)
-    return save_figure(fig, path, dpi=dpi, tight_layout=tight_layout)
+    return save_figure(fig, path, dpi=dpi, tight_layout=tight_layout, **save_kwargs)
 
 
 def save_plotly_html(fig, path: Path | str, *, include_plotlyjs: str = "cdn") -> Path:

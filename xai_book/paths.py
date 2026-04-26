@@ -26,7 +26,7 @@ def chapter_figure_dir(chapter: str) -> Path:
 def chapter_figure_path(
     chapter: str,
     filename: str,
-    suffix: str = ".png",
+    suffix: str = ".pdf",
     output_dir: Path | str | None = None,
 ) -> Path:
     suffix = suffix if suffix.startswith(".") else f".{suffix}"

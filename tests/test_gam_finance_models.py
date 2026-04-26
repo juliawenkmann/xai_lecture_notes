@@ -41,7 +41,10 @@ class FinanceGamModelTests(unittest.TestCase):
             metrics.loc[FINANCE_GAM_MODEL_LABELS["var"], "return_RMSE_bp"],
         )
         self.assertEqual(set(analysis["figures"]), set(FINANCE_GAM_FIGURE_FILENAMES))
-        self.assertEqual(set(FINANCE_GAM_TABLE_FILENAMES), {"metrics", "prediction_breakdown", "validation_search"})
+        self.assertEqual(
+            set(FINANCE_GAM_TABLE_FILENAMES),
+            {"metrics", "prediction_breakdown", "var_prediction_breakdown", "validation_search"},
+        )
         self.assertIn("validation_price_MAPE_pct", analysis["search"].columns)
 
         predicted = float(analysis["breakdown_frame"]["predicted_return"].iloc[0])

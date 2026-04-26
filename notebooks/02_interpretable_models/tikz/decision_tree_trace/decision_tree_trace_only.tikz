@@ -1,0 +1,81 @@
+\definecolor{xaiOrange}{HTML}{F28E2B}
+\definecolor{xaiGray}{HTML}{666666}
+\definecolor{xaiText}{HTML}{222222}
+
+\tikzset{
+  tree edge/.style={xaiText, line width=1.0pt},
+  trace edge/.style={xaiOrange, line width=2.0pt, -{Latex[length=2.4mm]}},
+  tree node/.style={
+    circle,
+    draw=xaiText,
+    line width=0.9pt,
+    fill=white,
+    minimum size=8.5mm,
+    inner sep=1pt,
+    font=\sffamily\scriptsize,
+    text=xaiText,
+    align=center
+  },
+  trace node/.style={
+    tree node,
+    draw=xaiOrange,
+    line width=1.8pt
+  },
+  leaf/.style={
+    circle,
+    draw=xaiText,
+    line width=0.9pt,
+    fill=white,
+    minimum size=7.5mm,
+    inner sep=1pt,
+    font=\sffamily\scriptsize,
+    text=xaiText,
+    align=center
+  },
+  traced leaf/.style={
+    leaf,
+    draw=xaiOrange,
+    line width=1.8pt,
+    fill=xaiOrange!8
+  },
+  label/.style={font=\sffamily\scriptsize, text=xaiText},
+  callout/.style={
+    font=\sffamily\scriptsize,
+    text=xaiText,
+    align=left,
+    fill=white,
+    fill opacity=0.86,
+    text opacity=1,
+    inner sep=1.5pt
+  },
+}
+
+\begin{tikzpicture}[x=1cm,y=1cm,font=\sffamily]
+
+  \node[trace node] (root) at (1.8,3.10) {$x_1$\\$\le c_1$};
+  \node[trace node] (left) at (0.65,2.00) {$x_2$\\$\le c_2$};
+  \node[tree node] (right) at (2.95,2.00) {$x_2$\\$\le c_4$};
+
+  \node[traced leaf] (leafA) at (-0.25,0.80) {$R_3$\\$1.2$};
+  \node[leaf] (leafB) at (1.30,0.80) {$R_2$\\$0.4$};
+  \node[leaf] (leafC) at (2.35,0.80) {$R_5$\\$-0.5$};
+  \node[leaf] (leafD) at (3.70,0.80) {$R_6$\\$-1.3$};
+
+  \draw[tree edge] (root) -- (right);
+  \draw[tree edge] (left) -- (leafB);
+  \draw[tree edge] (right) -- (leafC);
+  \draw[tree edge] (right) -- (leafD);
+
+  \draw[trace edge] (root) -- (left);
+  \draw[trace edge] (left) -- (leafA);
+
+  \node[label, anchor=south east] at ($(root)!0.52!(left)+(0,0.08)$) {left};
+  \node[label, anchor=south west] at ($(root)!0.52!(right)+(0,0.08)$) {right};
+  \node[label, text=xaiOrange, anchor=east] at ($(left)!0.50!(leafA)+(-0.05,0)$) {yes};
+  \node[label, anchor=west] at ($(left)!0.50!(leafB)+(0.05,0)$) {no};
+
+  \draw[xaiOrange, line width=1.0pt, -{Latex[length=2mm]}]
+    (2.42,3.45) -- (root.north east);
+  \node[callout, text=xaiOrange, anchor=west] at (2.48,3.45) {$\xi$};
+
+\end{tikzpicture}
