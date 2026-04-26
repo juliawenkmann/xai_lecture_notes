@@ -13,9 +13,9 @@
   segment/.style={draw=white, line width=1.0pt},
 }
 
-\begin{tikzpicture}[x=1cm,y=4.8cm,font=\sffamily]
+\begin{tikzpicture}[x=1cm,y=5.0cm,font=\sffamily]
 
-  \node[align=left, text=xaiText, font=\sffamily\footnotesize] (formula) at (0,0.92)
+  \node[align=left, text=xaiText, font=\sffamily\footnotesize, anchor=west] (formula) at (-0.08,0.98)
     {$\displaystyle
       \hat r_t^{\mathrm{stock}}
       = \textcolor{xaiGray}{0.10}
@@ -24,14 +24,14 @@
       = 0.80\%
     $};
 
-  \node[callout, anchor=east] (intercept) at (1.90,0.12)
+  \node[callout, anchor=east] (intercept) at (1.82,0.12)
     {\color{xaiGray}$0.10$\\intercept};
-  \node[callout, anchor=east] (stocklag) at (1.95,0.40)
+  \node[callout, anchor=east] (stocklag) at (1.82,0.41)
     {\color{xaiOrange}$0.60 \cdot 1.0 = 0.60$\\stock lag};
-  \node[callout, anchor=east] (marketlag) at (1.95,0.755)
+  \node[callout, anchor=east] (marketlag) at (1.82,0.68)
     {\color{xaiBlue}$0.20 \cdot 0.5 = 0.10$\\market lag};
 
-  \begin{scope}[shift={(2.65,0)}]
+  \begin{scope}[shift={(3.10,0)}]
     \draw[guide] (-0.12,0.10) -- (1.65,0.10);
     \draw[guide] (-0.12,0.70) -- (1.65,0.70);
     \draw[guide] (-0.12,0.80) -- (1.65,0.80);
@@ -48,16 +48,16 @@
     \path[fill=xaiBlue, segment] (0,0.70) rectangle (0.86,0.80);
     \draw[xaiText, line width=0.8pt] (0,0) rectangle (0.86,0.80);
 
-    \draw[guide] (0.86,0.80) -- (1.38,0.80);
+    \draw[guide] (0.86,0.80) -- (1.34,0.80);
     \node[label, anchor=west, font=\sffamily\scriptsize\bfseries, text=xaiText]
-      at (1.43,0.80) {forecast};
+      at (1.40,0.80) {forecast};
 
     \node[label, anchor=north, align=center] at (0.43,-0.055)
       {$\hat r_t^{\mathrm{stock}}$};
   \end{scope}
 
-  \draw[arrow] (intercept.east) -- ($(2.65,0.08)$);
-  \draw[arrow] (stocklag.east) -- ($(2.65,0.40)$);
-  \draw[arrow] (marketlag.east) -- ($(2.65,0.75)$);
+  \draw[arrow] (intercept.east) -- ($(3.10,0.08)$);
+  \draw[arrow] (stocklag.east) -- ($(3.10,0.40)$);
+  \draw[arrow] (marketlag.east) -- ($(3.10,0.75)$);
 
 \end{tikzpicture}
